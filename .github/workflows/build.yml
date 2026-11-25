@@ -1,38 +1,29 @@
-
-name: Criar APK
+name: Build APK
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master ]
   workflow_dispatch:
-
-permissions:
-  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: .github/workflows
     steps:
-      - name: Baixar projeto
-        uses: actions/checkout@v4
-
-      - name: Configurar Java
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
-      - name: Configurar Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Compilar APK
-        run: gradle assembleDebug
-
-      - name: Salvar APK
-        uses: actions/upload-artifact@v4
+      - uses: gradle/actions/setup-gradle@v4
         with:
-          name: Vortex-Game-Space-APK
-          path: '**/build/outputs/apk/debug/*.apk'
-          if-no-files-found: error
+          gradle-version: '8.7'
+      - name: Compilar APK
+        run: gradle assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VorteX-GameSpace
+          path: .github/workflows/app/build/outputs/apk/debug/*.apk
+          include-hidden-files: true
